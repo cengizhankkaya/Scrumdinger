@@ -1,11 +1,13 @@
+/*
+ See LICENSE folder for this sample’s licensing information.
+ */
+
 import SwiftUI
-
-
+import ThemeKit
 struct DetailEditView: View {
-    @State private var scrum = DailyScrum.emptyScrum
+    @Binding var scrum: DailyScrum
     @State private var attendeeName = ""
-
-
+    
     var body: some View {
         Form {
             Section(header: Text("Meeting Info")) {
@@ -19,6 +21,7 @@ struct DetailEditView: View {
                     Text("\(scrum.lengthInMinutes) minutes")
                         .accessibilityHidden(true)
                 }
+                ThemePicker(selection: $scrum.theme)
             }
             Section(header: Text("Attendees")) {
                 ForEach(scrum.attendees) { attendee in
@@ -28,13 +31,13 @@ struct DetailEditView: View {
                     scrum.attendees.remove(atOffsets: indices)
                 }
                 HStack {
-                    TextField("New Attende", text: $attendeeName )
+                    TextField("New Attendee", text: $attendeeName)
                     Button(action: {
-                            withAnimation {
-                                let attendee = DailyScrum.Attendee(name: attendeeName)
-                                               scrum.attendees.append(attendee)
-                                attendeeName = ""
-                                           }
+                        withAnimation {
+                            let attendee = DailyScrum.Attendee(name: attendeeName)
+                            scrum.attendees.append(attendee)
+                            attendeeName = ""
+                        }
                     }) {
                         Image(systemName: "plus.circle.fill")
                             .accessibilityLabel("Add attendee")
@@ -42,12 +45,17 @@ struct DetailEditView: View {
                     .disabled(attendeeName.isEmpty)
                 }
             }
-            
         }
     }
 }
 
+private struct DetailEditViewPreviewHost: View {
+    @State private var scrum: DailyScrum = DailyScrum.sampleData[0]
+    var body: some View {
+        DetailEditView(scrum: $scrum)
+    }
+}
 
 #Preview {
-    DetailEditView()
+    DetailEditViewPreviewHost()
 }

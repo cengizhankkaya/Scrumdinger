@@ -1,11 +1,11 @@
-/*
- See LICENSE folder for this sample’s licensing information.
- */
+import SwiftUI
+
 
 import SwiftUI
 
-public enum Theme: String, CaseIterable, Identifiable, Codable {
 
+public enum Theme: String, CaseIterable, Identifiable, Codable {
+    
     case bubblegum
     case buttercup
     case indigo
@@ -33,9 +33,9 @@ public enum Theme: String, CaseIterable, Identifiable, Codable {
         Color(rawValue, bundle: .module)
     }
     public var name: String {
-        rawValue.capitalized
-    }
-    public var id: String {
-        name
-    }
+         rawValue.capitalized
+     }
+     public var id: String {
+         name
+     }
 }
