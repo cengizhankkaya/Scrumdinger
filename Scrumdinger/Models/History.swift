@@ -1,0 +1,23 @@
+//
+//  History.swift
+//  Scrumdinger
+//
+//  Created by cengizhan kaya on 5.05.2026.
+//
+
+import Foundation
+import SwiftData
+
+@Model
+class History: Identifiable {
+    var id: UUID
+    var date: Date
+    var attendees: [Attendee]
+    var dailyScrum: DailyScrum?
+    
+    init(id: UUID = UUID(), date: Date = Date(), attendees: [Attendee]) {
+        self.id = id
+        self.date = date
+        self.attendees = attendees
+    }
+}
