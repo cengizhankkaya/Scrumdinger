@@ -8,11 +8,12 @@ struct DetailView: View {
 
 
     @State private var isPresentingEditView = false
+    @State private var errorWrapper: ErrorWrapper?
     
     var body: some View {
         List {
             Section(header: Text("Meeting Info")) {
-                NavigationLink(destination: MeetingView(scrum: scrum)) {
+                NavigationLink(destination: MeetingView(scrum: scrum, errorWrapper: $errorWrapper)) {
                     Label("Start Meeting", systemImage: "timer")
                         .font(.headline)
                         .foregroundColor(.accentColor)
@@ -55,7 +56,6 @@ struct DetailView: View {
         .toolbar {
             Button("Edit") {
                 isPresentingEditView = true
-                
             }
         }
         .sheet(isPresented: $isPresentingEditView) {
@@ -63,6 +63,9 @@ struct DetailView: View {
                 DetailEditView(scrum: scrum)
                     .navigationTitle(scrum.title)
             }
+        }
+        .sheet(item: $errorWrapper, onDismiss: nil) { wrapper in
+            ErrorView(errorWrapper: wrapper)
         }
     }
 }

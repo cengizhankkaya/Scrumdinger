@@ -2,7 +2,7 @@ import SwiftUI
 import ThemeKit
 import SwiftData
 
-
+@available(iOS 17, *)
 struct DetailEditView: View {
     let scrum: DailyScrum
 
@@ -12,6 +12,7 @@ struct DetailEditView: View {
     @State private var lengthInMinutesAsDouble: Double
     @State private var attendees: [Attendee]
     @State private var theme: Theme
+    @State private var errorWrapper: ErrorWrapper?
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
 
@@ -36,7 +37,8 @@ struct DetailEditView: View {
         self.attendees = scrumToEdit.attendees
         self.theme = scrumToEdit.theme
     }
-    
+
+
     var body: some View {
         Form {
             Section(header: Text("Meeting Info")) {
@@ -63,8 +65,8 @@ struct DetailEditView: View {
                     TextField("New Attendee", text: $attendeeName)
                     Button(action: {
                         withAnimation {
-                            let attendee = Attendee(name: attendeeName)
-                            attendees.append(attendee)
+                            let newAttendee = Attendee(name: attendeeName)
+                            attendees.append(newAttendee)
                             attendeeName = ""
                         }
                     }) {
@@ -83,27 +85,37 @@ struct DetailEditView: View {
             }
             ToolbarItem(placement: .confirmationAction) {
                 Button("Done") {
-                    saveEdits()
-                    dismiss()
+                    do {
+                        try saveEdits()
+                        dismiss()
+                    } catch {
+                        errorWrapper = ErrorWrapper(error: error, guidance: "Daily scrum was not recorded. Try again later.")
+                    }
                 }
             }
         }
+        .sheet(item: $errorWrapper) {
+            dismiss()
+        } content: { wrapper in
+            ErrorView(errorWrapper: wrapper)
+        }
     }
 
-
-    private func saveEdits() {
+    private func saveEdits() throws {
+#if canImport(SwiftData)
         scrum.title = title
         scrum.lengthInMinutesAsDouble = lengthInMinutesAsDouble
         scrum.attendees = attendees
         scrum.theme = theme
 
-
         if isCreatingScrum {
             context.insert(scrum)
         }
 
-
-        try? context.save()
+        try context.save()
+#else
+        preconditionFailure("SwiftData is not available on this platform/target. Ensure iOS 17+ and SwiftData framework are enabled.")
+#endif
     }
 }
 
@@ -112,3 +124,4 @@ struct DetailEditView: View {
     @Previewable @Query(sort: \DailyScrum.title) var scrums: [DailyScrum]
     DetailEditView(scrum: scrums[0])
 }
+
